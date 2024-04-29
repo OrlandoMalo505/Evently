@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Evently.Modules.Events.Application.Events.CreateEvent;
-public class CreateEventCommandValidator : AbstractValidator<CreateEventCommand>
+
+internal sealed class CreateEventCommandValidator : AbstractValidator<CreateEventCommand>
 {
     public CreateEventCommandValidator()
     {
-        RuleFor(x => x.Title).NotEmpty();
-        RuleFor(x => x.Description).NotEmpty();
-        RuleFor(x => x.Location).NotEmpty();
-        RuleFor(x => x.StartsAtUtc).NotEmpty();
-        RuleFor(x => x.EndsAtUtc)
-            .Must((cmd, endsAtUtc) => endsAtUtc > cmd.StartsAtUtc)
-            .When(x => x.EndsAtUtc.HasValue);
+        RuleFor(c => c.CategoryId).NotEmpty();
+        RuleFor(c => c.Title).NotEmpty();
+        RuleFor(c => c.Description).NotEmpty();
+        RuleFor(c => c.Location).NotEmpty();
+        RuleFor(c => c.StartsAtUtc).NotEmpty();
+        RuleFor(c => c.EndsAtUtc).Must((cmd, endsAt) => endsAt > cmd.StartsAtUtc).When(c => c.EndsAtUtc.HasValue);
     }
 }
