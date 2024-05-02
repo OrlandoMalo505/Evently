@@ -12,7 +12,10 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddApplication([Evently.Modules.Events.Application.AssemblyReference.Assembly]);
+
 builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("Database")!);
+
+builder.Configuration.AddModuleConfiguration(["events"]);
 
 builder.Services.AddEventsModule(builder.Configuration);
 
