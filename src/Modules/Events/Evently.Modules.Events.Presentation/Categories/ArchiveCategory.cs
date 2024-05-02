@@ -1,10 +1,10 @@
 ﻿using Evently.Modules.Events.Application.Categories.ArchiveCategory;
-using Evently.Modules.Events.Domain.Abstractions;
 using Evently.Modules.Events.Presentation.ApiResults;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Evently.Common.Domain.Abstractions;
 
 namespace Evently.Modules.Events.Presentation.Categories;
 

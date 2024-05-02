@@ -1,15 +1,22 @@
-
 using Evently.Api.Extensions;
 using Evently.Modules.Events.Infrastructure;
+using Evently.Common.Application;
+using Evently.Common.Infrastructure;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.CustomSchemaIds(t => t.FullName?.Replace("+", "."));
+});
+
+builder.Services.AddApplication([Evently.Modules.Events.Application.AssemblyReference.Assembly]);
+builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("Database")!);
 
 builder.Services.AddEventsModule(builder.Configuration);
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
