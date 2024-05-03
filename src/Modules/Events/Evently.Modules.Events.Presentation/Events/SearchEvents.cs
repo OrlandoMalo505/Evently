@@ -1,20 +1,21 @@
 ﻿using Evently.Common.Domain.Abstractions;
 using Evently.Modules.Events.Application.Events.SearchEvents;
-using Evently.Modules.Events.Presentation.ApiResults;
+using Evently.Common.Presentation.ApiResults;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Evently.Common.Presentation.Endpoints;
 
 namespace Evently.Modules.Events.Presentation.Events;
 
-internal static class SearchEvents
+internal sealed class SearchEvents : IEndpoint
 {
-    public static void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("events/search", async(
+        app.MapGet("events/search", async (
             ISender sender,
-            Guid ? categoryId,
+            Guid? categoryId,
             DateTime? startDate,
             DateTime? endDate,
             int page = 0,
@@ -23,7 +24,7 @@ internal static class SearchEvents
             Result<SearchEventsResponse> result = await sender.Send(
                 new SearchEventsQuery(categoryId, startDate, endDate, page, pageSize));
 
-            return result.Match(Results.Ok, ApiResults.ApiResults.Problem);
+            return result.Match(Results.Ok, Common.Presentation.ApiResults.ApiResults.Problem);
         })
         .WithTags(Tags.Events);
     }
