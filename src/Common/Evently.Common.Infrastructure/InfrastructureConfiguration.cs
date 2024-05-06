@@ -24,12 +24,19 @@ public static class InfrastructureConfiguration
 
         services.TryAddSingleton<PublishDomainEventsInterceptor>();
 
-        IConnectionMultiplexer connectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString);
+        try
+        {
+            IConnectionMultiplexer connectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString);
 
-        services.TryAddSingleton(connectionMultiplexer);
+            services.TryAddSingleton(connectionMultiplexer);
 
-        services.AddStackExchangeRedisCache(options =>
-            options.ConnectionMultiplexerFactory = () => Task.FromResult(connectionMultiplexer));
+            services.AddStackExchangeRedisCache(options =>
+                options.ConnectionMultiplexerFactory = () => Task.FromResult(connectionMultiplexer));
+        }
+        catch
+        {
+            services.AddDistributedMemoryCache();
+        }
 
         services.TryAddSingleton<ICacheService, CacheService>();
 
