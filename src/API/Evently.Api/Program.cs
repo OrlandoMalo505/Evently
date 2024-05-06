@@ -32,6 +32,7 @@ var redisConnectionString = builder.Configuration.GetConnectionString("Cache")!;
 var databaseConnectionString = builder.Configuration.GetConnectionString("Database")!;
 
 builder.Services.AddInfrastructure(
+    [TicketingModule.ConfigureConsumers],
     databaseConnectionString,
     redisConnectionString);
 
