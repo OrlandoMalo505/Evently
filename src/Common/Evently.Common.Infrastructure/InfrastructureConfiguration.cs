@@ -2,6 +2,7 @@
 using Evently.Common.Application.Data;
 using Evently.Common.Application.EventBus;
 using Evently.Common.Infrastructure.Authentication;
+using Evently.Common.Infrastructure.Authorization;
 using Evently.Common.Infrastructure.Caching;
 using Evently.Common.Infrastructure.Data;
 using Evently.Common.Infrastructure.Outbox;
@@ -22,6 +23,8 @@ public static class InfrastructureConfiguration
         string redisConnectionString)
     {
         services.AddAuthenticationInternal();
+
+        services.AddAuthorizationInternal();
 
         NpgsqlDataSource npgsqlDataSource = new NpgsqlDataSourceBuilder(databaseConnectionString).Build();
         services.TryAddSingleton(npgsqlDataSource);
