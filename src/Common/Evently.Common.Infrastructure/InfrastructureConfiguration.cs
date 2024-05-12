@@ -1,4 +1,5 @@
-﻿using Evently.Common.Application.Caching;
+﻿using Dapper;
+using Evently.Common.Application.Caching;
 using Evently.Common.Application.Data;
 using Evently.Common.Application.EventBus;
 using Evently.Common.Infrastructure.Authentication;
@@ -10,6 +11,7 @@ using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
+using Quartz;
 using StackExchange.Redis;
 
 namespace Evently.Common.Infrastructure;
@@ -31,7 +33,14 @@ public static class InfrastructureConfiguration
 
         services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
 
-        services.TryAddSingleton<PublishDomainEventsInterceptor>();
+        services.TryAddSingleton<InsertOutboxMessagesInterceptor>();
+
+        SqlMapper.AddTypeHandler(new GenericArrayHandler<string>());
+
+        services.AddQuartz();
+
+        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
+
 
         try
         {
