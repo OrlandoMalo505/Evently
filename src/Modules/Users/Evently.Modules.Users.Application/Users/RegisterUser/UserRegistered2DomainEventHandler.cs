@@ -1,7 +1,6 @@
 ﻿using Evently.Common.Application.EventBus;
 using Evently.Common.Application.Exceptions;
 using Evently.Common.Application.Messaging;
-using Evently.Common.Domain;
 using Evently.Common.Domain.Abstractions;
 using Evently.Modules.Users.Application.Users.GetUser;
 using Evently.Modules.Users.Domain.Users;
@@ -10,9 +9,8 @@ using MediatR;
 
 namespace Evently.Modules.Users.Application.Users.RegisterUser;
 
-internal sealed class UserRegisteredDomainEventHandler(
-    ISender sender,
-    IEventBus eventBus)
+internal sealed class UserRegistered2DomainEventHandler(
+    ISender sender)
     : DomainEventHandler<UserRegisteredDomainEvent>
 {
     public override async Task Handle(
@@ -24,16 +22,13 @@ internal sealed class UserRegisteredDomainEventHandler(
         if (result.IsFailure)
         {
             throw new EventlyException(nameof(GetUserQuery), result.Error);
+
         }
 
-        await eventBus.PublishAsync(
-            new UserRegisteredIntegrationEvent(
-                notification.Id,
-                notification.OccurredOnUtc,
-                result.Value.Id,
-                result.Value.Email,
-                result.Value.FirstName,
-                result.Value.LastName),
-            cancellationToken);
+        throw new Exception("UserRegistered2DomainEventHandler threw an error");
+
+        
+
+        
     }
 }
