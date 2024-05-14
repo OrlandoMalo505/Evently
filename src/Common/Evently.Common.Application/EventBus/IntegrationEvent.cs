@@ -7,6 +7,8 @@ public abstract class IntegrationEvent : IIntegrationEvent
         Id = id;
         OccurredOnUtc = occurredOnUtc;
     }
+
     public Guid Id { get; init; }
+
     public DateTime OccurredOnUtc { get; init; }
 }
