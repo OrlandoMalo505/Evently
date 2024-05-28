@@ -16,7 +16,8 @@ internal sealed class GetEventStatistics : IEndpoint
     {
         app.MapGet("event-statistics/{id}", async (Guid id, ISender sender) =>
         {
-            Result<EventStatisticsResponse> result = await sender.Send(new GetEventStatisticsQuery(id));
+            Result<Application.EventStatistics.EventStatistics> result =
+                await sender.Send(new GetEventStatisticsQuery(id));
 
             return result.Match(Results.Ok, ApiResults.Problem);
         })

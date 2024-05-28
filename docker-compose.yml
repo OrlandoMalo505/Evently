@@ -60,3 +60,14 @@ services:
       - 4317:4317
       - 4318:4318
       - 16686:16686
+
+  evently.mongo:
+    image: mongo:latest
+    container_name: Evently.Mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    volumes:
+      - ./.containers/mongo:/data/db
+    ports:
+      - 27017:27017

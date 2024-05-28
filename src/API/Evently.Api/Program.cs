@@ -33,18 +33,21 @@ builder.Services.AddApplication([
 
 var redisConnectionString = builder.Configuration.GetConnectionString("Cache")!;
 var databaseConnectionString = builder.Configuration.GetConnectionString("Database")!;
+var mongoConnectionString = builder.Configuration.GetConnectionString("Mongo")!;
 
 builder.Services.AddInfrastructure(
     DiagnosticsConfig.ServiceName,
     [TicketingModule.ConfigureConsumers],
     databaseConnectionString,
-    redisConnectionString);
+    redisConnectionString,
+    mongoConnectionString);
 
 builder.Configuration.AddModuleConfiguration(["events", "users", "ticketing", "attendance"]);
 
 builder.Services.AddHealthChecks()
     .AddNpgSql(databaseConnectionString)
     .AddRedis(redisConnectionString)
+    .AddMongoDb(mongoConnectionString)
     .AddUrlGroup(new Uri(builder.Configuration.GetValue<string>("KeyCloak:HealthUrl")!), HttpMethod.Get, "keycloak");
 
 builder.Services.AddEventsModule(builder.Configuration);

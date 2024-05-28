@@ -10,11 +10,16 @@ using Evently.Common.Infrastructure.Outbox;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using Npgsql;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Quartz;
 using StackExchange.Redis;
+using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 
 namespace Evently.Common.Infrastructure;
 
@@ -25,7 +30,8 @@ public static class InfrastructureConfiguration
         string serviceName,
         Action<IRegistrationConfigurator>[] moduleConfigureConsumers,
         string databaseConnectionString,
-        string redisConnectionString)
+        string redisConnectionString,
+        string mongoConnectionString)
     {
         services.AddAuthenticationInternal();
 
@@ -90,10 +96,28 @@ public static class InfrastructureConfiguration
                     .AddEntityFrameworkCoreInstrumentation()
                     .AddRedisInstrumentation()
                     .AddNpgsql()
-                    .AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
+                    .AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName)
+                    .AddSource("MongoDB.Driver.Core.Extensions.DiagnosticSources");
 
                 tracing.AddOtlpExporter();
             });
+
+        var mongoClientSettings = MongoClientSettings.FromConnectionString(mongoConnectionString);
+
+        mongoClientSettings.ClusterConfigurator = c => c.Subscribe(
+            new DiagnosticsActivityEventSubscriber(
+                new InstrumentationOptions
+                {
+                    CaptureCommandText = true
+                }));
+
+        services.AddSingleton<IMongoClient>(new MongoClient(mongoClientSettings));
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        BsonDefaults.GuidRepresentation = GuidRepresentation.Standard;
+        BsonDefaults.GuidRepresentationMode = GuidRepresentationMode.V3;
+#pragma warning restore CS0618 // Type or member is obsolete
+        BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
 
         return services;
     }
