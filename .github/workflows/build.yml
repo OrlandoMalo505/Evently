@@ -1,0 +1,44 @@
+name: CI/CD Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+env:
+  DOTNET_VERSION: "8.x"    
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore Evently.sln
+
+    - name: Build
+      run: dotnet build Evently.Sln --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test Evently.Sln --configuration Release --no-restore --no-build
+
+    - name: Publish
+      if: success()
+      run: dotnet publish Evently.Sln -c Release --no-restore -o ./publish
+
+    - name: Upload artifact
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: published-app
+        path: ./publish
